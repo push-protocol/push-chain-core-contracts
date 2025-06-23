@@ -4,6 +4,7 @@ pragma solidity 0.8.26;
 import {Errors} from "../libraries/Errors.sol";
 import {IUEA} from "../Interfaces/IUEA.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {ChainIdFetcher} from "../libraries/ChainIdFetcher.sol";
 import {
     UniversalAccount,
     UniversalPayload,
@@ -35,13 +36,7 @@ contract UEA_SVM is ReentrancyGuard, IUEA {
      * @return bytes32 The domain separator.
      */
     function domainSeparator() public view returns (bytes32) {
-        uint256 chainId;
-        /* solhint-disable no-inline-assembly */
-        /// @solidity memory-safe-assembly
-        assembly {
-            chainId := chainid()
-        }
-        /* solhint-enable no-inline-assembly */
+        uint256 chainId = ChainIdFetcher.getChainId(id.chain);
 
         return keccak256(abi.encode(DOMAIN_SEPARATOR_TYPEHASH, keccak256(bytes(VERSION)), chainId, address(this)));
     }
